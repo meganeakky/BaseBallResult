@@ -1,0 +1,60 @@
+package web;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+public class GiantsGameChecker {
+	private static int gameNum;
+	private static String path = "https://www.nikkansports.com/baseball/professional/team/giants/";
+
+	private static File file = new File(
+			"C:\\Users\\akkym\\OneDrive\\ドキュメント\\programing\\java\\development\\Item\\GameNum.txt");
+
+	public static void main(String[] args) {
+		try {
+			FileReader reader = new FileReader(file);
+			BufferedReader bReader = new BufferedReader(reader);
+			String line = "";
+			while ((line = bReader.readLine()) != null) {
+				gameNum = Integer.parseInt(line);
+				break;
+			}
+
+			a(gameNum);
+
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	private static void a(int gameNum) throws IOException {
+
+		Document document = Jsoup.connect(path + gameNum + "/top").get();
+//		Elements elements = document.select(".team");
+		Elements elements = document.select(".bb-head01__title");
+
+		for (Element ele : elements) {
+			System.out.println("text : " + ele.text());
+			if (ele.text().contains("巨人")) {
+
+				System.out.println("巨人の試合を見つけました");
+				break;
+			} else {
+				System.out.println("巨人の試合が見つからなかったため探しなおします");
+				a(++gameNum);
+			}
+		}
+		//			System.out.println(document.html());
+
+	}
+
+}

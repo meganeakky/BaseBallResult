@@ -1,8 +1,5 @@
 package web;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 
 import org.jsoup.Jsoup;
@@ -11,49 +8,41 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class GiantsGameChecker {
-	private static int gameNum;
-	private static String path = "https://baseball.yahoo.co.jp/npb/game/";
-
-	private static File file = new File(
-			"C:\\Users\\akkym\\OneDrive\\ドキュメント\\programing\\java\\development\\Item\\GameNum.txt");
+	private static String path = "https://www.nikkansports.com/baseball/professional/team/giants/";
+	private static StringBuilder resultStr = new StringBuilder("");
 
 	public static void main(String[] args) {
+
+
 		try {
-			FileReader reader = new FileReader(file);
-			BufferedReader bReader = new BufferedReader(reader);
-			String line = "";
-			while ((line = bReader.readLine()) != null) {
-				gameNum = Integer.parseInt(line);
-				break;
+			// URLの読み込み
+			Document document = Jsoup.connect(path).get();
+
+			if (document.select("h5").get(0).ownText().equals("【試合開始前】")) return;
+
+			// 必要なタグを抜き出す
+			Element tableEle = document.select("table").get(0);
+			Elements elements = tableEle.select(".tr");
+
+			// チームの状況を取得 ※Tableの1行目はヘッダー情報なので飛ばす
+			for (Element teamEle : elements) {
+				Elements t = teamEle.select(".team");
+				if (t == null || t.size() == 0) continue;
+
+				Element team = t.get(0);
+				Element resultEle = teamEle.selectFirst(".totalScore");
+
+				resultStr.append(team.ownText() + " " + resultEle.ownText());
+
+				if (teamEle.nextElementSibling() != null) {
+					resultEle.append("\r\n");
+				}
 			}
-
-			a(gameNum);
-
-
-		} catch (Exception e) {
+			//			System.out.println(document.html());
+		} catch (IOException e) {
+			// TODO 自動生成された catch ブロック
 			e.printStackTrace();
 		}
-
-	}
-
-	private static void a(int gameNum) throws IOException {
-
-		Document document = Jsoup.connect(path + gameNum + "/top").get();
-//		Elements elements = document.select(".team");
-		Elements elements = document.select(".bb-head01__title");
-
-		for (Element ele : elements) {
-			System.out.println("text : " + ele.text());
-			if (ele.text().contains("巨人")) {
-
-				System.out.println("巨人の試合を見つけました");
-				break;
-			} else {
-				System.out.println("巨人の試合が見つからなかったため探しなおします");
-				a(++gameNum);
-			}
-		}
-		//			System.out.println(document.html());
 
 	}
 

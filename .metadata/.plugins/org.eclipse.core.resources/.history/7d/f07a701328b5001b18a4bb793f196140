@@ -1,0 +1,71 @@
+package web;
+
+import java.io.IOException;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+public class GiantsGameChecker {
+	private static String path = "https://www.nikkansports.com/baseball/professional/team/giants/";
+	private static StringBuilder resultStr = new StringBuilder("");
+
+	public static void main(String[] args) {
+
+
+		try {
+			// URLの読み込み
+			Document document = Jsoup.connect(path).get();
+
+			if (document.select("h5").get(1).ownText().equals("【試合開始前】")) return;
+
+			// 必要なタグを抜き出す
+			Element tableEle = document.select("table").get(0);
+			Elements elements = tableEle.select(".tr");
+
+			// チームの状況を取得 ※Tableの1行目はヘッダー情報なので飛ばす
+			for (Element teamEle : elements) {
+				Elements t = teamEle.select(".team");
+				if (t == null || t.size() == 0) continue;
+
+				Element team = t.get(0);
+				Element resultEle = teamEle.selectFirst(".totalScore");
+
+				resultStr.append(team.ownText() + " " + resultEle.ownText());
+
+				if (teamEle.nextElementSibling() != null) {
+					resultEle.append("\r\n");
+				}
+
+			}
+			//			System.out.println(document.html());
+		} catch (IOException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
+
+	}
+
+	private static void a(int gameNum) throws IOException {
+
+		Document document = Jsoup.connect(path + gameNum + "/top").get();
+//		Elements elements = document.select(".team");
+		Elements elements = document.select(".bb-head01__title");
+
+		for (Element ele : elements) {
+			System.out.println("text : " + ele.text());
+			if (ele.text().contains("巨人")) {
+
+				System.out.println("巨人の試合を見つけました");
+				break;
+			} else {
+				System.out.println("巨人の試合が見つからなかったため探しなおします");
+				a(++gameNum);
+			}
+		}
+		//			System.out.println(document.html());
+
+	}
+
+}
