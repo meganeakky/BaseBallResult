@@ -1,0 +1,31 @@
+package web;
+
+import java.io.IOException;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+public class GiantsGameChecker {
+
+	public static void main(String[] args){
+		try {
+			Document document = Jsoup.connect("https://baseball.yahoo.co.jp/npb/game/2021000332/top").timeout(0).get();
+			Elements elements = document.select(".bb-head01__title");
+
+			for (Element ele : elements) {
+				System.out.println("text : " + ele.text());
+			}
+//			System.out.println(document.html());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public void main() throws IOException {
+		Document document = Jsoup.connect("https://baseball.yahoo.co.jp/npb/game/2021000332/top").get();
+	}
+
+}

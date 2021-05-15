@@ -1,0 +1,25 @@
+package web;
+
+import java.io.IOException;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+public class GiantsGameChecker {
+
+	public static void main(String[] args) throws IOException {
+		Document document = Jsoup.connect("https://baseball.yahoo.co.jp/npb/game/2021000332/top").get();
+		Elements elements = document.select("contentMain");
+
+		for (Element ele : elements) {
+			System.out.println("text : " + ele.text());
+		}
+	}
+
+	public void main() throws IOException {
+		Document document = Jsoup.connect("https://baseball.yahoo.co.jp/npb/game/2021000332/top").get();
+	}
+
+}
